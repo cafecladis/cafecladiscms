@@ -14,3 +14,4 @@ const APP_ROOT = __DIR__;
 
 // Load required files
 require APP_ROOT . '/config.php';
+require APP_ROOT . '/core/Application.php';

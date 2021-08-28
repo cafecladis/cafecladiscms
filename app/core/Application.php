@@ -1,6 +1,6 @@
 <?php
 /**
- * Main page processor
+ * Class Application
  *
  * @package CafeCladisCMS
  * @author Frau Cladis <hey@fraucladis.de>
@@ -9,7 +9,10 @@
  * @license GPL
  */
 
-// Load required files
-require __DIR__ . '/../app/init.php';
-
-$app = new Application();
+class Application
+{
+    public function __construct()
+    {
+        echo 'Cafe Cladis CMS OK!';
+    }
+}
