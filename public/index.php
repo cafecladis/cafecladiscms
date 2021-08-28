@@ -12,4 +12,4 @@
 // Load required files
 require __DIR__ . '/../app/init.php';
 
-echo 'Cafe Cladis CMS';
+echo 'Cafe Cladis CMS running';
