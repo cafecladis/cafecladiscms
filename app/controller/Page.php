@@ -11,10 +11,11 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2021, Café Cladis
  * @license GPL
  */
-class Page
+class Page extends Controller
 {
     public function home()
     {
-        echo 'home';
+        $data['title'] = SITE_NAME . ' :: Home';
+        $this->view('home', 'main', $data);
     }
 }

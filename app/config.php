@@ -8,3 +8,7 @@
  * @copyright Copyright (c) 2021, Café Cladis
  * @license GPL
  */
+
+const SITE_NAME = 'Cafe Cladis';
+const SITE_LANGUAGE = 'en';
+const SITE_CHARSET = 'UTF-8';

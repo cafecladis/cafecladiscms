@@ -67,7 +67,7 @@ class Application
 
         // Remaining parts of the request url are additional parameters
         // TODO: Handle too many parameters in request url
-        $this->parameters = $request ? array_values($request) : [];
+        $this->parameters = $request ? array_slice(array_values($request), 0, 1) : [];
 
         unset($request);
 
