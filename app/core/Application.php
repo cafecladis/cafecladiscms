@@ -31,47 +31,54 @@ class Application
         $request = $this->parseRequestUri();
 
         // If a controller is called without a method exit with 404 NOT FOUND
-        if(!empty($request[0]) && !isset($request[1])) {
-            echo '404 NOT FOUND';
-            exit;
+        if (!empty($request[0]) && empty($request[1])) {
+            // TODO: Handle HTTP 404 response
+            exit('404 NOT FOUND');
         }
-
-        $controllerFileName = !empty($request[0]) ? ucwords($request[0]) : 'Page';
-        $controllerFile = APP_ROOT . '/controller/' . $controllerFileName . '.php';
 
         // Set controller
-        if (is_file($controllerFile)) {
-            $this->controller = $controllerFileName;
-            unset($request[0]);
-
-            require $controllerFile;
-
-            if (class_exists($this->controller)) {
-                $this->controller = new $this->controller();
-            }
+        switch ($request[0]) {
+            case '':
+            case 'page':
+                $this->controller = 'Page';
+                break;
+            default:
+                exit('404 NOT FOUND');
         }
+
+        unset($request[0]);
+
+        $this->loadController();
 
         // Set method
         $this->method = !empty($request[1]) ? $request[1] : 'home';
-        unset($request[1]);
 
-        // If method doesn't exist exit with 404 NOT FOUND
-        if (!method_exists($this->controller, $this->method)) {
-            echo '404 NOT FOUND';
-            exit;
+        // Valid methods
+        $validMethods = match (get_class($this->controller)) {
+            'Page' => ['home']
+        };
+
+        // If method is not allowed or method doesn't exist exit with 404 NOT FOUND
+        if (!in_array($this->method, $validMethods) || !method_exists($this->controller, $this->method)) {
+            exit('404 NOT FOUND');
         }
 
-        // Set parameters
+        unset($request[1]);
+
+        // Remaining parts of the request url are additional parameters
+        // TODO: Handle too many parameters in request url
         $this->parameters = $request ? array_values($request) : [];
 
-        // Call method in controller and pass additional parameters
+        unset($request);
+
+        // Call method in controller class and pass additional parameters
         call_user_func_array([$this->controller, $this->method], $this->parameters);
     }
 
     /**
      * Splits parts of the request url into an array for further usage.
      *
-     * @return array Parts of request uri
+     * @return array Elements of request uri
      */
     private function parseRequestUri(): array
     {
@@ -87,5 +94,33 @@ class Application
         $requestUri = explode('/', $requestUri);
         // Remove paths from filename strings and return sanitized array
         return array_map('basename', $requestUri);
+    }
+
+    /**
+     * Loads controller class file and makes a new instance of controller class.
+     *
+     * @throws Exception Controller file not found, Controller class doesn't exist
+     * @return void
+     */
+    private function loadController(): void
+    {
+        // Path to controller file
+        $controllerFile = APP_ROOT . '/controller/' . $this->controller . '.php';
+
+        // Check if controller file exists
+        if (!is_file($controllerFile)) {
+            throw new Exception('Controller class file not found: ' . $controllerFile);
+        }
+
+        // Load controller file
+        require $controllerFile;
+
+        // Check if class exists
+        if (!class_exists($this->controller)) {
+            throw new Exception('Missing controller class:' . $this->controller);
+        }
+
+        // Instantiate class
+        $this->controller = new $this->controller();
     }
 }
